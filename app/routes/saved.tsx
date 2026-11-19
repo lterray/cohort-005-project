@@ -4,6 +4,7 @@ import { db } from "~/db";
 import { people } from "~/modules/permissions/person.server";
 import { listBookmarks } from "~/lib/bookmarks.server";
 import { listNotes } from "~/lib/notes.server";
+import { NoteBody } from "~/components/note-body";
 import { Card, CardContent } from "~/components/ui/card";
 import { Bookmark, NotebookPen } from "lucide-react";
 import { formatRelativeTime } from "~/lib/utils";
@@ -74,8 +75,7 @@ export default function Saved({ loaderData }: Route.ComponentProps) {
             <div className="space-y-2">
               {savedNotes.map((note) => (
                 <SavedLessonCard key={note.id} lesson={note.lesson}>
-                  {/* Plain text — a Note is never rendered as Markdown. */}
-                  <p className="whitespace-pre-wrap text-sm">{note.body}</p>
+                  <NoteBody body={note.body} />
                   <p
                     suppressHydrationWarning
                     className="text-xs text-muted-foreground"
