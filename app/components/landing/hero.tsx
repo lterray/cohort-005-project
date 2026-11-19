@@ -14,7 +14,7 @@ export function Hero({
 }: {
   signedIn: boolean;
   stats: CatalogueStats;
-  spotlight: FeaturedCourse | undefined;
+  spotlight: FeaturedCourse | null;
 }) {
   return (
     <section className="relative overflow-hidden border-b border-border">

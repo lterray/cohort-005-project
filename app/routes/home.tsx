@@ -32,7 +32,7 @@ export function meta() {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { featuredCourses, stats } = landingPage.get();
+  const { spotlight, newCourses, stats } = landingPage.get();
   const users = getAllUsers();
   const currentUserId = await getCurrentUserId(request);
   const currentUser = currentUserId ? getUserById(currentUserId) : null;
@@ -40,7 +40,8 @@ export async function loader({ request }: Route.LoaderArgs) {
   const countryTierInfo = getCountryTierInfo(devCountry);
 
   return {
-    featuredCourses,
+    spotlight,
+    newCourses,
     stats,
     users: users.map((u) => ({ id: u.id, name: u.name, role: u.role })),
     currentUser: currentUser
@@ -54,7 +55,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function Home({ loaderData }: Route.ComponentProps) {
   const {
-    featuredCourses,
+    spotlight,
+    newCourses,
     stats,
     users,
     currentUser,
@@ -67,9 +69,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader signedIn={signedIn} />
-      <Hero signedIn={signedIn} stats={stats} spotlight={featuredCourses[0]} />
+      <Hero signedIn={signedIn} stats={stats} spotlight={spotlight} />
       <HowItWorks />
-      <FeaturedCourses courses={featuredCourses} />
+      <FeaturedCourses courses={newCourses} />
       <SiteFooter signedIn={signedIn} />
 
       <DevUI

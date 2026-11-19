@@ -81,18 +81,43 @@ function landing() {
   return createLandingPage(db).get();
 }
 
-// ─── Featured courses ───
+// ─── Spotlight and new courses ───
 
-describe("featured courses", () => {
-  it("lists the newest published courses first, at most three", () => {
+function shownTitles() {
+  const { spotlight, newCourses } = landing();
+  return {
+    spotlight: spotlight?.title ?? null,
+    newCourses: newCourses.map((course) => course.title),
+  };
+}
+
+function shownCourses() {
+  const { spotlight, newCourses } = landing();
+  return spotlight ? [spotlight, ...newCourses] : newCourses;
+}
+
+describe("spotlight and new courses", () => {
+  it("spotlights the newest published course and lists the next three", () => {
     addCourse("Oldest", { createdAt: "2098-01-01T00:00:00.000Z" });
     addCourse("Newest", { createdAt: "2098-04-01T00:00:00.000Z" });
     addCourse("Middle", { createdAt: "2098-03-01T00:00:00.000Z" });
     addCourse("Second", { createdAt: "2098-03-15T00:00:00.000Z" });
 
-    const titles = landing().featuredCourses.map((course) => course.title);
+    expect(shownTitles()).toEqual({
+      spotlight: "Newest",
+      newCourses: ["Second", "Middle", "Oldest"],
+    });
+  });
 
-    expect(titles).toEqual(["Newest", "Second", "Middle"]);
+  it("shows no course twice and at most four in all", () => {
+    for (let i = 0; i < 5; i++) {
+      addCourse(`Extra ${i}`, { createdAt: `209${i}-01-01T00:00:00.000Z` });
+    }
+
+    const ids = shownCourses().map((course) => course.id);
+
+    expect(ids).toHaveLength(4);
+    expect(new Set(ids).size).toBe(4);
   });
 
   it("leaves out drafts and archived courses", () => {
@@ -105,13 +130,14 @@ describe("featured courses", () => {
       createdAt: "2099-01-01T00:00:00.000Z",
     });
 
-    const titles = landing().featuredCourses.map((course) => course.title);
-
-    expect(titles).toEqual(["Test Course"]);
+    expect(shownTitles()).toEqual({
+      spotlight: "Test Course",
+      newCourses: [],
+    });
   });
 
   it("carries the instructor, category and cover of each course", () => {
-    const [course] = landing().featuredCourses;
+    const course = landing().spotlight;
 
     expect(course).toEqual({
       id: baseCourse.id,
@@ -133,7 +159,7 @@ describe("featured courses", () => {
     addLessons(other.id, [4]);
 
     const counts = Object.fromEntries(
-      landing().featuredCourses.map((c) => [c.title, c.lessonCount])
+      shownCourses().map((c) => [c.title, c.lessonCount])
     );
 
     expect(counts).toEqual({ "Test Course": 5, Other: 4 });
@@ -143,7 +169,8 @@ describe("featured courses", () => {
     const empty = createTestDb();
 
     expect(createLandingPage(empty).get()).toEqual({
-      featuredCourses: [],
+      spotlight: null,
+      newCourses: [],
       stats: { courses: 0, lessons: 0, instructors: 0 },
     });
   });

@@ -15,8 +15,9 @@ export type {
 export function createLandingPage(database: Db) {
   return {
     /**
-     * The newest published courses, each with its lesson count, and the
-     * size of the published catalogue. Drafts and archived courses are
+     * The newest published course as the spotlight, the next newest after
+     * it, each with its lesson count, and the size of the published
+     * catalogue. Drafts and archived courses are
      * never shown or counted.
      */
     get() {

@@ -12,7 +12,7 @@ import {
 
 export type Db = BetterSQLite3Database<typeof schema>;
 
-const FEATURED_COURSE_LIMIT = 3;
+const NEW_COURSE_LIMIT = 3;
 
 export type FeaturedCourse = {
   id: number;
@@ -32,7 +32,8 @@ export type CatalogueStats = {
 };
 
 export type LandingPage = {
-  featuredCourses: FeaturedCourse[];
+  spotlight: FeaturedCourse | null;
+  newCourses: FeaturedCourse[];
   stats: CatalogueStats;
 };
 
@@ -54,7 +55,7 @@ function getNewestPublishedCourses(db: Db) {
     .innerJoin(categories, eq(courses.categoryId, categories.id))
     .where(isPublished)
     .orderBy(desc(courses.createdAt), desc(courses.id))
-    .limit(FEATURED_COURSE_LIMIT)
+    .limit(1 + NEW_COURSE_LIMIT)
     .all();
 }
 
@@ -104,8 +105,10 @@ function getCatalogueStats(db: Db): CatalogueStats {
 }
 
 export function getLandingPage(db: Db): LandingPage {
+  const [spotlight = null, ...newCourses] = getFeaturedCourses(db);
   return {
-    featuredCourses: getFeaturedCourses(db),
+    spotlight,
+    newCourses,
     stats: getCatalogueStats(db),
   };
 }
