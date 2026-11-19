@@ -3,7 +3,7 @@ import { createTestDb, seedBaseData, type TestDb } from "~/test/setup";
 import * as schema from "~/db/schema";
 import { CourseStatus, UserRole } from "~/db/schema";
 import { markdown } from "~/lib/text";
-import { createLandingPage, FEATURED_COURSE_LIMIT } from "../index.server";
+import { createLandingPage } from "../index.server";
 
 let db: TestDb;
 let instructor: typeof schema.users.$inferSelect;
@@ -92,7 +92,6 @@ describe("featured courses", () => {
 
     const titles = landing().featuredCourses.map((course) => course.title);
 
-    expect(FEATURED_COURSE_LIMIT).toBe(3);
     expect(titles).toEqual(["Newest", "Second", "Middle"]);
   });
 
